@@ -72,15 +72,17 @@
           pottery: "5.jpeg"
       };
 
-      let silverLocations = [2, 5, 11, 21, 32]; 
-      let goldLocation = 15; 
-      let snakeLocation = 20; 
+      let silverLocations = [2, 5, 11, 21, 32]; // Silver positions
+      let goldLocation = 15; // Gold position
+      let snakeLocation = 20; // Snake position
       let score = 0;
       let locationsChecked = 0;
       let lastChecked = -1;
       let gameOver = false;
       let boardSize = { rows: 5, cols: 7 };
+      let totalCells = boardSize.rows * boardSize.cols;
 
+      // Generate the game board
       let gameBoard = document.getElementById("game-board");
 
       for (let i = 0; i < boardSize.rows; i++) {
@@ -92,31 +94,87 @@
               cell.classList.add("game-cell");
 
               let imgElem = document.createElement("img");
-              let position = i * boardSize.cols + j; 
+              let position = i * boardSize.cols + j; // Unique ID for each cell
               imgElem.src = img.cactus;
-              imgElem.id = "img" + position;
+              imgElem.id = "img-" + position;
               imgElem.alt = "Cactus";
               imgElem.onclick = function () { check(position); };
 
               cell.appendChild(imgElem);
               rowDiv.appendChild(cell);
           }
-
           gameBoard.appendChild(rowDiv);
       }
+
+      function getRandomPositions(count, exclude = []) {
+          let positions = [];
+          while (positions.length < count) {
+              let pos = Math.floor(Math.random() * totalCells);
+              if (!positions.includes(pos) && !exclude.includes(pos)) {
+                  positions.push(pos);
+              }
+          }
+            return positions;
+        }
+
+        function initializeGame() {
+          let positions = getRandomPositions(7);
+          silverLocations = positions.slice(0, 5);
+          goldLocation = positions[5];
+          snakeLocation = positions[6];
+          renderBoard();
+      }
+
+        function renderBoard() {
+            for (let i = 0; i < totalCells; i++) {
+                let imgElem = document.getElementById("img-" + i);
+                imgElem.src = img.cactus;
+            }
+    
+            silverLocations.forEach(pos => {
+                let imgElem = document.getElementById("img-" + pos);
+                imgElem.src = img.silver;
+            });
+
+            let goldImg = document.getElementById("img-" + goldLocation);
+            goldImg.src = img.gold;
+
+            let snakeImg = document.getElementById("img-" + snakeLocation);
+            snakeImg.src = img.snake;
+
+            score = 0;
+            locationsChecked = 0;
+            lastChecked = -1;
+            gameOver = false;
+            document.getElementById("score").innerText = `Score is ${score}`;
+            document.getElementById("locations").innerText = `Number of locations checked is ${locationsChecked}`;
+            document.getElementById("help").innerText = "Help report";
+        }
+
+        // Move the snake to a random location
+        function moveSnake() {
+            let snakeImg = document.getElementById("img-" + snakeLocation);
+            snakeImg.src = img.cactus;
+
+            let newSnakeLocation = Math.floor(Math.random() * totalCells);
+            snakeLocation = newSnakeLocation;
+
+            let newSnakeImg = document.getElementById("img-" + snakeLocation);
+            newSnakeImg.src = img.snake;
+        }
 
       function check(position) {
           if (gameOver) return;
 
-          let imgElem = document.getElementById("img" + position);
+          let imgElem = document.getElementById("img-" + position);
 
-          if (position === goldLocation) {
+          if (position == goldLocation) {
               imgElem.src = img.gold;
               score += 5;
           } else if (silverLocations.includes(position)) {
               imgElem.src = img.silver;
               score += 3;
-          } else if (position === snakeLocation) {
+          } else if (position == snakeLocation) {
               imgElem.src = img.snake;
               score -= 3;
               gameOver = true;
@@ -129,10 +187,12 @@
           lastChecked = position;
           document.getElementById("score").innerText = `Score is ${score}`;
           document.getElementById("locations").innerText = `Number of locations checked is ${locationsChecked}`;
+
+          moveSnake();
       }
 
       function help() {
-          if (lastChecked === -1) {
+          if (lastChecked == -1) {
               document.getElementById("help").innerText = "Click on a tile first.";
               return;
           }
