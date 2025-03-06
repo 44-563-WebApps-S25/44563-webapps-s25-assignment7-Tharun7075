@@ -36,8 +36,8 @@
     <h1>Tharun Reflexes</h1>
 
     <div class="container">
-        <p id="count">Count: 5</p>
-        <p id="Final">Your time: --</p>
+        <p id="count">Count: </p>
+        <p id="Final">Your Time: </p>
 
         <button id="go">Go</button>
         <button id="halt">Halt</button>
@@ -57,9 +57,12 @@
             let targetElement = document.getElementById("Final");
 
             
-            for (let i = 0; i <= 5; i++) {
+            countdownTime = Math.floor(Math.random() * 9) + 2; // Random between 2 and 10
+            console.log("Countdown starts at:", countdownTime);
+
+            for (let i = 0; i <= countdownTime; i++) {
                 setTimeout(() => {
-                    countdownElement.innerHTML = `Count: ${5 - i}`;
+                    countdownElement.innerHTML = `Count: ${countdownTime - i}`;
                 }, i * 1000);
             }
 
